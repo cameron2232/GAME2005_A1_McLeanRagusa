@@ -3,8 +3,9 @@
 #include "Game.h"
 #include "SoundManager.h"
 #include "TextureManager.h"
+#include <stdlib.h>
 
-Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963)
+Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(45)
 {
 	TextureManager::Instance().load("../Assets/textures/thermaldetonator.png", "particle");
 
@@ -72,14 +73,14 @@ void Particle::update()
 	//}
 
 	if (m_isBeingThrown) {
-		getRigidBody()->velocity.x = initialVelocity * cos(Util::Deg2Rad * launchAngleDeg);
-		getRigidBody()->velocity.y = initialVelocity * sin(Util::Deg2Rad * launchAngleDeg);
+		getRigidBody()->velocity.x = (initialVelocity * pixelsPerMeter) * cos(Util::Deg2Rad * launchAngleDeg);
+		getRigidBody()->velocity.y = (initialVelocity * pixelsPerMeter) * sin(Util::Deg2Rad * launchAngleDeg);
 
 		auto delta = Game::Instance().getDeltaTime();
 		totalFlightTime += delta;
 
 		float newXpos = initialPos.x + (getRigidBody()->velocity.x * totalFlightTime);
-		float newYpos = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * getRigidBody()->acceleration.y * pow(totalFlightTime, 2));
+		float newYpos = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * (getRigidBody()->acceleration.y * pixelsPerMeter) * pow(totalFlightTime, 2));
 
 		deltaX = newXpos - getTransform()->position.x;
 		deltaY = newYpos - getTransform()->position.y;

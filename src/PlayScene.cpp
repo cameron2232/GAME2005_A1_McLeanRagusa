@@ -27,6 +27,9 @@ void PlayScene::update()
 	if (m_pParticle->isBeingThrown())
 		scrollScene();
 
+	if (CollisionManager::circleAABBCheck(m_pParticle, m_pGround[0]) || CollisionManager::circleAABBCheck(m_pParticle, m_pGround[1]))
+		m_pParticle->setIsBeingThrown(false);
+
 	updateDisplayList();	
 }
 
@@ -113,12 +116,21 @@ void PlayScene::start()
 void PlayScene::scrollScene()
 {
 	float deltaX = m_pParticle->getDeltaX();
+	float deltaY = m_pParticle->getDeltaY();
 
-	m_pParticle->setInitialPos(glm::vec2(m_pParticle->getInitialPos().x - deltaX, m_pParticle->getInitialPos().y));
+	if (m_pGround[0]->getTransform()->position.y - m_pParticle->getTransform()->position.y < 200) {
+		deltaY = 0;
+	}
+	else
+		m_pParticle->getTransform()->position.y -= deltaY;
+
 	m_pParticle->getTransform()->position.x -= deltaX;
+
+	m_pParticle->setInitialPos(glm::vec2(m_pParticle->getInitialPos().x - deltaX, m_pParticle->getInitialPos().y - deltaY));
 
 	for (int i = 0; i < m_pGround.size(); i++) {
 		m_pGround[i]->getTransform()->position.x -= deltaX;
+		m_pGround[i]->getTransform()->position.y -= deltaY;
 
 		if (m_pGround[i]->getTransform()->position.x < -m_pGround[i]->getWidth() / 2) {
 			for (int j = 0; j < m_pGround.size(); j++) {
