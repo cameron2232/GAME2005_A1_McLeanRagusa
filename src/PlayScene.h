@@ -3,7 +3,7 @@
 #define __PLAY_SCENE__
 
 #include "Scene.h"
-#include "ExampleSprite.h"
+#include "Particle.h"
 #include "Button.h"
 #include "Label.h"
 
@@ -26,18 +26,10 @@ private:
 	
 	glm::vec2 m_mousePosition;
 
-	ExampleSprite* m_pExampleSprite;
-	ExampleSprite* m_pExampleSprite2;
-
-	float a, b, c, d, t, dt;
-
-	
-	bool m_playerFacingRight;
-
 	// UI Items
 	Button* m_pBackButton;
-	Button* m_pNextButton;
-	Label* m_pInstructionsLabel;
+
+	Particle* m_pParticle;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
