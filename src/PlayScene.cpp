@@ -118,6 +118,11 @@ void PlayScene::scrollScene()
 	float deltaX = m_pParticle->getDeltaX();
 	float deltaY = m_pParticle->getDeltaY();
 
+	int backgroundOffsetX = m_pParticle->getDeltaTotalX() / 75;
+	int backgroundOffsetY = m_pParticle->getDeltaTotalY() / 75;
+
+	m_pBackground->getTransform()->position = glm::vec2(0 - backgroundOffsetX, (600 - m_pBackground->getHeight()) - backgroundOffsetY);
+
 	if (m_pGround[0]->getTransform()->position.y - m_pParticle->getTransform()->position.y < 200) {
 		deltaY = 0;
 	}

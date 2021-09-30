@@ -128,6 +128,16 @@ float Particle::getDeltaY()
 	return deltaY;
 }
 
+float Particle::getDeltaTotalX()
+{
+	return getTransform()->position.x - initialPos.x;
+}
+
+float Particle::getDeltaTotalY()
+{
+	return getTransform()->position.y - initialPos.y;
+}
+
 glm::vec2 Particle::getInitialPos()
 {
 	return initialPos;

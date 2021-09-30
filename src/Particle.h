@@ -21,6 +21,8 @@ public:
 	bool isBeingThrown();
 	float getDeltaX();
 	float getDeltaY();
+	float getDeltaTotalX();
+	float getDeltaTotalY();
 	glm::vec2 getInitialPos();
 
 	//setters
