@@ -1,10 +1,10 @@
 #include "Particle.h"
-
-
+#include "Util.h"
+#include "Game.h"
 #include "SoundManager.h"
 #include "TextureManager.h"
 
-Particle::Particle() : m_gravity(9.8f), m_force(-20.0f), m_isGrounded(false)
+Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963)
 {
 	TextureManager::Instance().load("../Assets/textures/thermaldetonator.png", "particle");
 
@@ -12,18 +12,13 @@ Particle::Particle() : m_gravity(9.8f), m_force(-20.0f), m_isGrounded(false)
 	setWidth(size.x);
 	setHeight(size.y);
 
-	getRigidBody()->velocity = glm::vec2(95 * cos(15.88963), 95 * sin(15.88963));
-	getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
-	m_isGrounded = false;
+	getRigidBody()->acceleration = glm::vec2(0.0f, m_gravity);
+	m_isBeingThrown = false;
 
-	getTransform()->position = glm::vec2(75.0f, 500.0f);
+	getTransform()->position = initialPos = glm::vec2(400.0f, 464.0f);
 
 	setType(OBSTACLE);
 	getRigidBody()->isColliding = false;
-
-	m_currentAngle = 15.88963;
-	m_drag = 0.88f;
-
 }
 
 Particle::~Particle()
@@ -34,26 +29,26 @@ void Particle::draw()
 	TextureManager::Instance().draw("particle",
 		getTransform()->position.x, getTransform()->position.y, 0, 255, true);
 
-	const float DEG_TO_RADIANDS = (double)M_PI / (double)180.0;
+	//const float DEG_TO_RADIANDS = (double)M_PI / (double)180.0;
 
-	float vx = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
-	float vy = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
+	//float vx = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
+	//float vy = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
 
-	float simTime = 0.0f;
-	float timeStep = totalSimDuration / (float)numPoints;
-	glm::vec2 nextPoint;
-	glm::vec2 lastPoint = glm::vec2(75.0f, 500.0f);
+	//float simTime = 0.0f;
+	//float timeStep = totalSimDuration / (float)numPoints;
+	//glm::vec2 nextPoint;
+	//glm::vec2 lastPoint = glm::vec2(75.0f, 500.0f);
 
-	for (int i = 0; i < numPoints; i++)
-	{
-		nextPoint.x = 75.0f + vx * simTime;
-		nextPoint.y = 450.0f + vy * simTime + 0.5 * 981 * pow(simTime, 2);
+	//for (int i = 0; i < numPoints; i++)
+	//{
+	//	nextPoint.x = 75.0f + vx * simTime;
+	//	nextPoint.y = 450.0f + vy * simTime + 0.5 * 981 * pow(simTime, 2);
 
-		//std::cout << "(" << lastPoint.x <<", " << lastPoint.y << ") | (" << nextPoint.x << ", " << nextPoint.y << "\n";
-		TextureManager::Instance().draw("particle", nextPoint.x, nextPoint.y, 0, 255, true);
+	//	//std::cout << "(" << lastPoint.x <<", " << lastPoint.y << ") | (" << nextPoint.x << ", " << nextPoint.y << "\n";
+	//	TextureManager::Instance().draw("particle", nextPoint.x, nextPoint.y, 0, 255, true);
 
-		simTime += timeStep;
-	}
+	//	simTime += timeStep;
+	//}
 }
 
 void Particle::update()
@@ -74,7 +69,16 @@ void Particle::update()
 	//	simTime += timeStep;
 	//}
 
-	getRigidBody()->velocity.y += getRigidBody()->acceleration.y;
+	if (m_isBeingThrown) {
+		getRigidBody()->velocity.x = initialVelocity * cos(Util::Deg2Rad * launchAngleDeg);
+		getRigidBody()->velocity.y = initialVelocity * sin(Util::Deg2Rad * launchAngleDeg);
+
+		auto delta = Game::Instance().getDeltaTime();
+		totalFlightTime += delta;
+
+		getTransform()->position.x = initialPos.x + (getRigidBody()->velocity.x * totalFlightTime);
+		getTransform()->position.y = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * getRigidBody()->acceleration.y * pow(totalFlightTime, 2));
+	}
 	
 	/*if(!m_isGrounded)
 	{
@@ -98,4 +102,14 @@ void Particle::update()
 
 void Particle::clean()
 {
+}
+
+bool Particle::isBeingThrown()
+{
+	return m_isBeingThrown;
+}
+
+void Particle::setIsBeingThrown(bool beingThrown)
+{
+	m_isBeingThrown = beingThrown;
 }

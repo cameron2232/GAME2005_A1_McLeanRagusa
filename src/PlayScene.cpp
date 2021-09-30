@@ -43,6 +43,11 @@ void PlayScene::handleEvents()
 		TheGame::Instance().quit();
 	}
 
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_SPACE))
+	{
+		m_pParticle->setIsBeingThrown(true);
+	}
+
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
 	{
 		TheGame::Instance().changeSceneState(START_SCENE);
@@ -58,6 +63,14 @@ void PlayScene::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
+
+	m_pBackground = new Background();
+	addChild(m_pBackground);
+
+	m_pGround.push_back(new Ground());
+	m_pGround.push_back(new Ground(1920, 636));
+	for (int i = 0; i < 2; i++)
+		addChild(m_pGround[i]);
 
 	m_pParticle = new Particle();
 	addChild(m_pParticle);

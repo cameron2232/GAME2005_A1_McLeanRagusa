@@ -4,6 +4,8 @@
 
 #include "Scene.h"
 #include "Particle.h"
+#include "Background.h"
+#include "Ground.h"
 #include "Button.h"
 #include "Label.h"
 
@@ -30,6 +32,8 @@ private:
 	Button* m_pBackButton;
 
 	Particle* m_pParticle;
+	Background* m_pBackground;
+	std::vector<Ground*> m_pGround;
 };
 
 #endif /* defined (__PLAY_SCENE__) */

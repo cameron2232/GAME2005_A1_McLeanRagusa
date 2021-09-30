@@ -16,21 +16,29 @@ public:
 	void draw() override;
 	void update() override;
 	void clean() override;
+
+	//getters
+	bool isBeingThrown();
+
+	//setters
+	void setIsBeingThrown(bool beingThrown);
 private:
 	float m_gravity;
 	bool m_isGrounded;
-	float m_force;
+	bool m_isBeingThrown;
+
 	glm::vec2 m_currentDirection;
-	double m_currentAngle;
 	glm::vec2 m_targetPosition;
-	float m_drag;
-	double launchAngleDeg = 15.88963;
-	float PixelsPerSec = 50;
-	glm::vec2 startPos = glm::vec2(75.0f, 500.0f);
-	int numPoints = 1500;
+
+	double launchAngleDeg;
+	float initialVelocity;
+	int pixelsPerMeter;
+	glm::vec2 initialPos;
+
 	float totalSimDuration = 14.0f;
 	float speedAdjustmentRate = 10;
 	float elevationRate = 10;
+	float totalFlightTime;
 };
 
 #endif /* defined (__OBSTACLE__) */
