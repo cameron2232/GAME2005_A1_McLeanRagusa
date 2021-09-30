@@ -6,8 +6,12 @@
 #include "Particle.h"
 #include "Background.h"
 #include "Ground.h"
+#include "Wookiee.h"
+#include "Stormtroopers.h"
 #include "Button.h"
 #include "Label.h"
+
+#define PIXELS_PER_METER 40
 
 class PlayScene : public Scene
 {
@@ -34,6 +38,8 @@ private:
 	Button* m_pBackButton;
 
 	Particle* m_pParticle;
+	Wookiee* m_pWookiee;
+	StormTroopers* m_pStormTroopers;
 	Background* m_pBackground;
 	std::vector<Ground*> m_pGround;
 };

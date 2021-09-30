@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include <stdlib.h>
 
-Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(45)
+Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963), spinAngle(0)
 {
 	TextureManager::Instance().load("../Assets/textures/thermaldetonator.png", "particle");
 
@@ -29,84 +29,35 @@ Particle::~Particle()
 
 void Particle::draw()
 {
-	TextureManager::Instance().draw("particle",
-		getTransform()->position.x, getTransform()->position.y, 0, 255, true);
-
-	//const float DEG_TO_RADIANDS = (double)M_PI / (double)180.0;
-
-	//float vx = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
-	//float vy = cos(-launchAngleDeg * DEG_TO_RADIANDS) * PixelsPerSec;
-
-	//float simTime = 0.0f;
-	//float timeStep = totalSimDuration / (float)numPoints;
-	//glm::vec2 nextPoint;
-	//glm::vec2 lastPoint = glm::vec2(75.0f, 500.0f);
-
-	//for (int i = 0; i < numPoints; i++)
-	//{
-	//	nextPoint.x = 75.0f + vx * simTime;
-	//	nextPoint.y = 450.0f + vy * simTime + 0.5 * 981 * pow(simTime, 2);
-
-	//	//std::cout << "(" << lastPoint.x <<", " << lastPoint.y << ") | (" << nextPoint.x << ", " << nextPoint.y << "\n";
-	//	TextureManager::Instance().draw("particle", nextPoint.x, nextPoint.y, 0, 255, true);
-
-	//	simTime += timeStep;
-	//}
+	TextureManager::Instance().draw("particle", getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
 }
 
 void Particle::update()
 {
-	//float simTime = 0.0f;
-	//float timeStep = totalSimDuration / (float)numPoints;
-	//glm::vec2 nextPoint = glm::vec2(75.0f, 500.0f);
-	//glm::vec2 lastPoint;
-	//
-	//for(int i = 0; i < numPoints; i++)
-	//{
-	//	nextPoint.x = 75.0f - getRigidBody()->velocity.x * simTime;
-	//	nextPoint.y = 450.0f - getRigidBody()->velocity.y * simTime + 0.5*981 * pow(simTime, 2);
-
-	//	//std::cout << "(" << lastPoint.x <<", " << lastPoint.y << ") | (" << nextPoint.x << ", " << nextPoint.y << "\n";
-	//	TextureManager::Instance().draw("particle", nextPoint.x, nextPoint.y, 0, 255, true);
-	//	
-	//	simTime += timeStep;
-	//}
-
 	if (m_isBeingThrown) {
+		//updates the angle that the particle is being drawn with, animation purposes only
+		spinAngle += 6;
+
+		//apply the PPM scale to the velocity and adjust it according to the x and y axis using COS and SIN
 		getRigidBody()->velocity.x = (initialVelocity * pixelsPerMeter) * cos(Util::Deg2Rad * launchAngleDeg);
 		getRigidBody()->velocity.y = (initialVelocity * pixelsPerMeter) * sin(Util::Deg2Rad * launchAngleDeg);
 
+		//get the change in time between the previous and current frame, and add it to total time
 		auto delta = Game::Instance().getDeltaTime();
 		totalFlightTime += delta;
 
+		//using the equations of projectile motion, determine the x and y positions of the particle in motion, and apply the PPM scale to gravity (y acceleration)
 		float newXpos = initialPos.x + (getRigidBody()->velocity.x * totalFlightTime);
 		float newYpos = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * (getRigidBody()->acceleration.y * pixelsPerMeter) * pow(totalFlightTime, 2));
 
+		//determine the change in distance between the previous position and current
 		deltaX = newXpos - getTransform()->position.x;
 		deltaY = newYpos - getTransform()->position.y;
 
+		//update the particles position
 		getTransform()->position.x = newXpos;
 		getTransform()->position.y = newYpos;
 	}
-	
-	/*if(!m_isGrounded)
-	{
-		getRigidBody()->velocity.y += getRigidBody()->acceleration.y + m_gravity * 0.025f;
-		getRigidBody()->velocity.y = std::min(std::max(getRigidBody()->velocity.y, m_force), m_gravity);
-		getTransform()->position.y += getRigidBody()->velocity.y;
-		getRigidBody()->acceleration.y = 0.0f;
-	}
-
-	if(getTransform()->position.y >= 500.0f)
-	{
-		m_isGrounded = true;
-		getRigidBody()->acceleration.y = 0.0f;
-		getTransform()->position.y = 500.0f;
-	}
-	else
-	{
-		m_isGrounded = false;
-	}*/
 }
 
 void Particle::clean()
@@ -128,11 +79,13 @@ float Particle::getDeltaY()
 	return deltaY;
 }
 
+//determine the change of horizontal distance between the particles current position and its initial throwing point
 float Particle::getDeltaTotalX()
 {
 	return getTransform()->position.x - initialPos.x;
 }
 
+//determine the change of vertical distance between the particles current position and its initial throwing point
 float Particle::getDeltaTotalY()
 {
 	return getTransform()->position.y - initialPos.y;

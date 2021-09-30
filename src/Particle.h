@@ -37,13 +37,11 @@ private:
 	glm::vec2 m_targetPosition;
 
 	double launchAngleDeg;
+	int spinAngle;
 	float initialVelocity;
 	int pixelsPerMeter;
 	glm::vec2 initialPos;
 
-	/*float totalSimDuration = 14.0f;
-	float speedAdjustmentRate = 10;
-	float elevationRate = 10;*/
 	float totalFlightTime;
 	float deltaX;
 	float deltaY;

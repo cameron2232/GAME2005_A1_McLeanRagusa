@@ -79,7 +79,19 @@ void PlayScene::start()
 		addChild(m_pGround[i]);
 
 	m_pParticle = new Particle();
+
+	//Note: Original position is 400, 464. Add these values when calculating placement
+	m_pStormTroopers = new StormTroopers();
+	m_pStormTroopers->getTransform()->position = m_pParticle->getInitialPos();
+	m_pStormTroopers->getTransform()->position.x += 485 * PIXELS_PER_METER, m_pParticle->getInitialPos().y - (m_pStormTroopers->getHeight() / 2) + (m_pParticle->getHeight() / 2);
+	addChild(m_pStormTroopers);
+
 	addChild(m_pParticle);
+
+	m_pWookiee = new Wookiee();
+	m_pWookiee->getTransform()->position = m_pParticle->getInitialPos();
+	m_pWookiee->getTransform()->position.y -= (m_pWookiee->getHeight() / 2) - (m_pParticle->getHeight() / 2);
+	addChild(m_pWookiee);
 	
 	// Example Sprite
 	/*m_pExampleSprite = new ExampleSprite();
@@ -115,24 +127,31 @@ void PlayScene::start()
 
 void PlayScene::scrollScene()
 {
+	//get the particles change in X and Y
 	float deltaX = m_pParticle->getDeltaX();
 	float deltaY = m_pParticle->getDeltaY();
 
+	//used to slowly move the background
 	int backgroundOffsetX = m_pParticle->getDeltaTotalX() / 75;
 	int backgroundOffsetY = m_pParticle->getDeltaTotalY() / 75;
 
+	//updates the background position as the particle moves
 	m_pBackground->getTransform()->position = glm::vec2(0 - backgroundOffsetX, (600 - m_pBackground->getHeight()) - backgroundOffsetY);
 
+	//used to prevent the particle's focus from dropping below the ground
 	if (m_pGround[0]->getTransform()->position.y - m_pParticle->getTransform()->position.y < 200) {
 		deltaY = 0;
 	}
 	else
 		m_pParticle->getTransform()->position.y -= deltaY;
 
+	//keeps the particle in the center of the X axis
 	m_pParticle->getTransform()->position.x -= deltaX;
 
+	//updates the initial position as the particle moves (required so that scrolling scene does not mess up results)
 	m_pParticle->setInitialPos(glm::vec2(m_pParticle->getInitialPos().x - deltaX, m_pParticle->getInitialPos().y - deltaY));
 
+	//updates the ground scrolling along X
 	for (int i = 0; i < m_pGround.size(); i++) {
 		m_pGround[i]->getTransform()->position.x -= deltaX;
 		m_pGround[i]->getTransform()->position.y -= deltaY;
@@ -143,6 +162,14 @@ void PlayScene::scrollScene()
 			}
 		}
 	}
+
+	//updates Wookiees position
+	m_pWookiee->getTransform()->position.x -= deltaX;
+	m_pWookiee->getTransform()->position.y -= deltaY;
+
+	//updates the Stormtroopers position
+	m_pStormTroopers->getTransform()->position.x -= deltaX;
+	m_pStormTroopers->getTransform()->position.y -= deltaY;
 }
 
 void PlayScene::GUI_Function() 
