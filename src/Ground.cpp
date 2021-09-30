@@ -13,7 +13,7 @@ Ground::Ground()
 }
 
 Ground::Ground(float x, float y) : Ground() {
-	getTransform()->position = glm::vec2(x + getWidth() / 2, y + getHeight() / 2);
+	getTransform()->position = glm::vec2(x + getWidth() / 2, y - getHeight() / 2);
 }
 
 Ground::~Ground()

@@ -21,6 +21,8 @@ public:
 	virtual void clean() override;
 	virtual void handleEvents() override;
 	virtual void start() override;
+
+	void scrollScene();
 private:
 	// IMGUI Function
 	void GUI_Function();

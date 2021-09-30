@@ -19,9 +19,13 @@ public:
 
 	//getters
 	bool isBeingThrown();
+	float getDeltaX();
+	float getDeltaY();
+	glm::vec2 getInitialPos();
 
 	//setters
 	void setIsBeingThrown(bool beingThrown);
+	void setInitialPos(glm::vec2 pos);
 private:
 	float m_gravity;
 	bool m_isGrounded;
@@ -35,10 +39,12 @@ private:
 	int pixelsPerMeter;
 	glm::vec2 initialPos;
 
-	float totalSimDuration = 14.0f;
+	/*float totalSimDuration = 14.0f;
 	float speedAdjustmentRate = 10;
-	float elevationRate = 10;
+	float elevationRate = 10;*/
 	float totalFlightTime;
+	float deltaX;
+	float deltaY;
 };
 
 #endif /* defined (__OBSTACLE__) */

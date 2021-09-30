@@ -19,6 +19,8 @@ Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.
 
 	setType(OBSTACLE);
 	getRigidBody()->isColliding = false;
+	deltaX = 0;
+	deltaY = 0;
 }
 
 Particle::~Particle()
@@ -76,8 +78,14 @@ void Particle::update()
 		auto delta = Game::Instance().getDeltaTime();
 		totalFlightTime += delta;
 
-		getTransform()->position.x = initialPos.x + (getRigidBody()->velocity.x * totalFlightTime);
-		getTransform()->position.y = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * getRigidBody()->acceleration.y * pow(totalFlightTime, 2));
+		float newXpos = initialPos.x + (getRigidBody()->velocity.x * totalFlightTime);
+		float newYpos = initialPos.y - (getRigidBody()->velocity.y * totalFlightTime) - (0.5 * getRigidBody()->acceleration.y * pow(totalFlightTime, 2));
+
+		deltaX = newXpos - getTransform()->position.x;
+		deltaY = newYpos - getTransform()->position.y;
+
+		getTransform()->position.x = newXpos;
+		getTransform()->position.y = newYpos;
 	}
 	
 	/*if(!m_isGrounded)
@@ -109,7 +117,27 @@ bool Particle::isBeingThrown()
 	return m_isBeingThrown;
 }
 
+float Particle::getDeltaX()
+{
+	return deltaX;
+}
+
+float Particle::getDeltaY()
+{
+	return deltaY;
+}
+
+glm::vec2 Particle::getInitialPos()
+{
+	return initialPos;
+}
+
 void Particle::setIsBeingThrown(bool beingThrown)
 {
 	m_isBeingThrown = beingThrown;
+}
+
+void Particle::setInitialPos(glm::vec2 pos)
+{
+	initialPos = pos;
 }

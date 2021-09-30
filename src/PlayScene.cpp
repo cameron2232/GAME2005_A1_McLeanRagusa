@@ -24,7 +24,10 @@ void PlayScene::draw()
 
 void PlayScene::update()
 {
-	updateDisplayList();
+	if (m_pParticle->isBeingThrown())
+		scrollScene();
+
+	updateDisplayList();	
 }
 
 void PlayScene::clean()
@@ -105,6 +108,24 @@ void PlayScene::start()
 	addChild(m_pBackButton);*/
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
+}
+
+void PlayScene::scrollScene()
+{
+	float deltaX = m_pParticle->getDeltaX();
+
+	m_pParticle->setInitialPos(glm::vec2(m_pParticle->getInitialPos().x - deltaX, m_pParticle->getInitialPos().y));
+	m_pParticle->getTransform()->position.x -= deltaX;
+
+	for (int i = 0; i < m_pGround.size(); i++) {
+		m_pGround[i]->getTransform()->position.x -= deltaX;
+
+		if (m_pGround[i]->getTransform()->position.x < -m_pGround[i]->getWidth() / 2) {
+			for (int j = 0; j < m_pGround.size(); j++) {
+				m_pGround[j]->getTransform()->position.x += m_pGround[j]->getWidth();
+			}
+		}
+	}
 }
 
 void PlayScene::GUI_Function() 
