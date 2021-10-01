@@ -204,6 +204,8 @@ void PlayScene::reset()
 		m_pLabels[i]->setEnabled(false);
 
 	canEditValues = true;
+	m_pParticle->setIsPlaying(false);
+	m_pParticle->setEnabled(true);
 }
 
 void PlayScene::updateLabels()
@@ -263,7 +265,6 @@ void PlayScene::GUI_Function()
 		m_pParticle->setLaunchAngle(15.88963);
 		m_pParticle->setGravity(-9.8);
 		m_pStormTroopers->setXDistance(485);
-		m_pParticle->setIsPlaying(false);
 	}
 
 	if (ImGui::Button("Set Values to Solution 2")) {
