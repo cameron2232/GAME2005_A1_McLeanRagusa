@@ -5,12 +5,13 @@
 #include "TextureManager.h"
 #include <stdlib.h>
 
-Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963), spinAngle(0), animationCount(1), animationTime(0)
+Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963), spinAngle(0), animationCount(1), animationTime(0), isPlaying(false)
 {
 	TextureManager::Instance().load("../Assets/textures/thermaldetonator.png", "particle");
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion1.png", "explode1");
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion2.png", "explode2");
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion3.png", "explode3");
+	SoundManager::Instance().load("../Assets/audio/explosion_1.wav", "Kaboom", SOUND_SFX);
 
 	auto size = TextureManager::Instance().getTextureSize("particle");
 	setWidth(size.x);
@@ -36,6 +37,11 @@ void Particle::draw()
 		TextureManager::Instance().draw("particle", getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
 	else if(getIsAnimating())
 	{
+		if(!isPlaying)
+		{
+			SoundManager::Instance().playSound("Kaboom", 0, 0);
+			isPlaying = true;
+		}
 		std::string tempString = "explode" + std::to_string(animationCount);
 		TextureManager::Instance().draw(tempString, getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
 		animationTime++;
@@ -155,6 +161,11 @@ int Particle::getAnimationCount()
 void Particle::setIsAnimated(bool isAnimating)
 {
 	m_isAnimating = isAnimating;
+}
+
+void Particle::setIsPlaying(bool playing)
+{
+	isPlaying = playing;
 }
 
 void Particle::setIsBeingThrown(bool beingThrown)

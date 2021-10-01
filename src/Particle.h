@@ -42,6 +42,7 @@ public:
 	void setGravity(float grav);
 	void clearThrownSettings();
 	void setIsAnimated(bool isAnimating);
+	void setIsPlaying(bool playing);
 	
 private:
 	float m_gravity;
@@ -60,6 +61,7 @@ private:
 	float totalFlightTime;
 	float deltaX;
 	float deltaY;
+	bool isPlaying;
 };
 
 #endif /* defined (__OBSTACLE__) */

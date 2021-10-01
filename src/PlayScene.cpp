@@ -263,6 +263,7 @@ void PlayScene::GUI_Function()
 		m_pParticle->setLaunchAngle(15.88963);
 		m_pParticle->setGravity(-9.8);
 		m_pStormTroopers->setXDistance(485);
+		m_pParticle->setIsPlaying(false);
 	}
 
 	if (ImGui::Button("Set Values to Solution 2")) {
@@ -271,6 +272,11 @@ void PlayScene::GUI_Function()
 		m_pParticle->setLaunchAngle(45);
 		m_pParticle->setGravity(-9.8);
 		m_pStormTroopers->setXDistance(920);
+	}
+
+	if (ImGui::Button("Toggle Visibility of Stormtroopers"))
+	{
+		m_pStormTroopers->setEnabled(!m_pStormTroopers->isEnabled());
 	}
 
 	if (ImGui::Button("Reset")) {
