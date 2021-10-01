@@ -17,6 +17,9 @@ public:
 	void update() override;
 	void clean() override;
 
+	// animation
+	void Animate();
+
 	//getters
 	bool isBeingThrown();
 	float getDeltaX();
@@ -28,6 +31,8 @@ public:
 	float getLaunchAngle();
 	float getGravity();
 	float getTotalFlightTime();
+	bool getIsAnimating();
+	int getAnimationCount();
 
 	//setters
 	void setIsBeingThrown(bool beingThrown);
@@ -36,16 +41,21 @@ public:
 	void setLaunchAngle(float angle);
 	void setGravity(float grav);
 	void clearThrownSettings();
+	void setIsAnimated(bool isAnimating);
+	
 private:
 	float m_gravity;
 	bool m_isGrounded;
 	bool m_isBeingThrown;
+	bool m_isAnimating;
 
 	double launchAngleDeg;
 	int spinAngle;
 	float initialVelocity;
 	int pixelsPerMeter;
 	glm::vec2 initialPos;
+	int animationTime;
+	int animationCount;
 
 	float totalFlightTime;
 	float deltaX;

@@ -34,7 +34,13 @@ void PlayScene::update()
 		scrollScene();
 
 	if (CollisionManager::circleAABBCheck(m_pParticle, m_pGround[0]) || CollisionManager::circleAABBCheck(m_pParticle, m_pGround[1]))
+	{
+		if (m_pParticle->isBeingThrown())
+			m_pParticle->setIsAnimated(true);
 		m_pParticle->setIsBeingThrown(false);
+		m_pStormTroopers->setEnabled(false);
+	}
+		
 
 	updateDisplayList();	
 }
@@ -58,6 +64,7 @@ void PlayScene::handleEvents()
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_SPACE))
 	{
 		m_pParticle->setIsBeingThrown(true);
+		m_pStormTroopers->setEnabled(true);
 		canEditValues = false;
 
 		for (int i = 0; i < 3; i++)
@@ -185,6 +192,7 @@ void PlayScene::reset()
 
 	m_pStormTroopers->setXDistance(m_pStormTroopers->getXDistance());
 	m_pStormTroopers->getTransform()->position.y = m_pParticle->getInitialPos().y - (m_pStormTroopers->getHeight() / 2) + (m_pParticle->getHeight() / 2);
+	m_pStormTroopers->setEnabled(true);
 
 	m_pBackground->getTransform()->position = glm::vec2(0, 600 - m_pBackground->getHeight());
 	m_pGround[0]->getTransform()->position = glm::vec2(m_pGround[0]->getWidth() / 2, 636 - m_pGround[0]->getHeight() / 2);

@@ -5,9 +5,12 @@
 #include "TextureManager.h"
 #include <stdlib.h>
 
-Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963), spinAngle(0)
+Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.0f), initialVelocity(95.0f), pixelsPerMeter(40), launchAngleDeg(15.88963), spinAngle(0), animationCount(1), animationTime(0)
 {
 	TextureManager::Instance().load("../Assets/textures/thermaldetonator.png", "particle");
+	TextureManager::Instance().load("../Assets/textures/bomb_explosion1.png", "explode1");
+	TextureManager::Instance().load("../Assets/textures/bomb_explosion2.png", "explode2");
+	TextureManager::Instance().load("../Assets/textures/bomb_explosion3.png", "explode3");
 
 	auto size = TextureManager::Instance().getTextureSize("particle");
 	setWidth(size.x);
@@ -29,7 +32,26 @@ Particle::~Particle()
 
 void Particle::draw()
 {
-	TextureManager::Instance().draw("particle", getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
+	if(!getIsAnimating())
+		TextureManager::Instance().draw("particle", getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
+	else if(getIsAnimating())
+	{
+		std::string tempString = "explode" + std::to_string(animationCount);
+		TextureManager::Instance().draw(tempString, getTransform()->position.x, getTransform()->position.y, spinAngle, 255, true);
+		animationTime++;
+		if (animationTime % 20 == 0)
+		{
+			if (animationCount == 3)
+			{
+				setIsAnimated(false);
+				setEnabled(false);
+				animationCount = 1;
+				return;
+			}
+			animationCount++;
+		}
+			
+	}
 }
 
 void Particle::update()
@@ -61,6 +83,10 @@ void Particle::update()
 }
 
 void Particle::clean()
+{
+}
+
+void Particle::Animate()
 {
 }
 
@@ -114,6 +140,21 @@ float Particle::getGravity()
 float Particle::getTotalFlightTime()
 {
 	return totalFlightTime;
+}
+
+bool Particle::getIsAnimating()
+{
+	return m_isAnimating;
+}
+
+int Particle::getAnimationCount()
+{
+	return animationCount;
+}
+
+void Particle::setIsAnimated(bool isAnimating)
+{
+	m_isAnimating = isAnimating;
 }
 
 void Particle::setIsBeingThrown(bool beingThrown)
