@@ -12,6 +12,12 @@ public:
 	void draw() override;
 	void update() override;
 	void clean() override;
+
+	int getXDistance();
+	void setXDistance(int x);
+
+private:
+	int xDistance;
 };
 
 #endif // !__STORMTROOPERS_H__

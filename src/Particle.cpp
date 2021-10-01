@@ -96,6 +96,26 @@ glm::vec2 Particle::getInitialPos()
 	return initialPos;
 }
 
+float Particle::getInitialVelocity()
+{
+	return initialVelocity;
+}
+
+float Particle::getLaunchAngle()
+{
+	return launchAngleDeg;
+}
+
+float Particle::getGravity()
+{
+	return getRigidBody()->acceleration.y;
+}
+
+float Particle::getTotalFlightTime()
+{
+	return totalFlightTime;
+}
+
 void Particle::setIsBeingThrown(bool beingThrown)
 {
 	m_isBeingThrown = beingThrown;
@@ -104,4 +124,27 @@ void Particle::setIsBeingThrown(bool beingThrown)
 void Particle::setInitialPos(glm::vec2 pos)
 {
 	initialPos = pos;
+}
+
+void Particle::setInitialVelocity(float vel)
+{
+	initialVelocity = vel;
+}
+
+void Particle::setLaunchAngle(float angle)
+{
+	launchAngleDeg = angle;
+}
+
+void Particle::setGravity(float grav)
+{
+	getRigidBody()->acceleration.y = grav;
+}
+
+void Particle::clearThrownSettings()
+{
+	spinAngle = 0;
+	totalFlightTime = 0;
+	deltaX = 0;
+	deltaY = 0;
 }

@@ -18,7 +18,13 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
+	updateLabels();
 	drawDisplayList();
+
+	if (!m_pParticle->isBeingThrown())
+		Util::DrawLine(m_pParticle->getInitialPos(), glm::vec2(m_pParticle->getInitialPos().x + (cos(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity()),
+				m_pParticle->getInitialPos().y - (sin(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity())));
+
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
 }
 
@@ -52,6 +58,12 @@ void PlayScene::handleEvents()
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_SPACE))
 	{
 		m_pParticle->setIsBeingThrown(true);
+		canEditValues = false;
+
+		for (int i = 0; i < 3; i++)
+			m_pLabels[i]->setEnabled(false);
+		for (int i = 3; i < 6; i++)
+			m_pLabels[i]->setEnabled(true);
 	}
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
@@ -68,7 +80,9 @@ void PlayScene::handleEvents()
 void PlayScene::start()
 {
 	// Set GUI Title
-	m_guiTitle = "Play Scene";
+	m_guiTitle = "Physics Simulation";
+
+	canEditValues = true;
 
 	m_pBackground = new Background();
 	addChild(m_pBackground);
@@ -83,7 +97,8 @@ void PlayScene::start()
 	//Note: Original position is 400, 464. Add these values when calculating placement
 	m_pStormTroopers = new StormTroopers();
 	m_pStormTroopers->getTransform()->position = m_pParticle->getInitialPos();
-	m_pStormTroopers->getTransform()->position.x += 485 * PIXELS_PER_METER, m_pParticle->getInitialPos().y - (m_pStormTroopers->getHeight() / 2) + (m_pParticle->getHeight() / 2);
+	m_pStormTroopers->getTransform()->position.x += 485 * PIXELS_PER_METER;
+	m_pStormTroopers->getTransform()->position.y = m_pParticle->getInitialPos().y - (m_pStormTroopers->getHeight() / 2) + (m_pParticle->getHeight() / 2);
 	addChild(m_pStormTroopers);
 
 	addChild(m_pParticle);
@@ -92,35 +107,21 @@ void PlayScene::start()
 	m_pWookiee->getTransform()->position = m_pParticle->getInitialPos();
 	m_pWookiee->getTransform()->position.y -= (m_pWookiee->getHeight() / 2) - (m_pParticle->getHeight() / 2);
 	addChild(m_pWookiee);
+
+	SDL_Color black = { 0, 0, 0, 255 };
+	m_pLabels.push_back(new Label("X Velocity: " + std::to_string(cos(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity()) + "m/s", "Consolas", 16, black, glm::vec2(130.0f, 10.0f)));
+	m_pLabels.push_back(new Label("Y Velocity: " + std::to_string(sin(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity()) + "m/s", "Consolas", 16, black, glm::vec2(130.0f, 30.0f)));
+	m_pLabels.push_back(new Label("Press [SPACE] to throw the Thermal Detonator or [`] for options", "Consolas", 20, black, glm::vec2(400.0f, 500.0f)));
+	m_pLabels.push_back(new Label("X Distance: " + std::to_string(m_pParticle->getDeltaTotalX()) + "m", "Consolas", 16, black, glm::vec2(130.0f, 10.0f)));
+	m_pLabels.back()->setEnabled(false);
+	m_pLabels.push_back(new Label("Y Distance: " + std::to_string(m_pParticle->getDeltaTotalY() * -1) + "m", "Consolas", 16, black, glm::vec2(130.0f, 30.0f)));
+	m_pLabels.back()->setEnabled(false);
+	m_pLabels.push_back(new Label("Time Elapsed: " + std::to_string(m_pParticle->getTotalFlightTime()) + "s", "Consolas", 16, black, glm::vec2(130.0f, 50.0f)));
+	m_pLabels.back()->setEnabled(false);
+
+	for (int i = 0; i < m_pLabels.size(); i++)
+		addChild(m_pLabels[i]);
 	
-	// Example Sprite
-	/*m_pExampleSprite = new ExampleSprite();
-	addChild(m_pExampleSprite);
-	m_pExampleSprite->getTransform()->position = glm::vec2(400.0f, 200.0f);
-
-	m_pExampleSprite2 = new ExampleSprite();
-	addChild(m_pExampleSprite2);
-	m_pExampleSprite2->getTransform()->position = glm::vec2(c + 200, d);*/
-
-	//// Back Button
-	//m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
-	//m_pBackButton->getTransform()->position = glm::vec2(300.0f, 400.0f);
-	//m_pBackButton->addEventListener(CLICK, [&]()-> void
-	//{
-	//	m_pBackButton->setActive(false);
-	//	TheGame::Instance().changeSceneState(START_SCENE);
-	//});
-
-	/*m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
-	{
-		m_pBackButton->setAlpha(128);
-	});
-
-	m_pBackButton->addEventListener(MOUSE_OUT, [&]()->void
-	{
-		m_pBackButton->setAlpha(255);
-	});
-	addChild(m_pBackButton);*/
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
@@ -172,15 +173,101 @@ void PlayScene::scrollScene()
 	m_pStormTroopers->getTransform()->position.y -= deltaY;
 }
 
-void PlayScene::GUI_Function() 
+void PlayScene::reset()
+{
+	m_pParticle->setIsBeingThrown(false);
+	m_pParticle->setInitialPos(glm::vec2(400.0f, 464.0f));
+	m_pParticle->getTransform()->position = m_pParticle->getInitialPos();
+	m_pParticle->clearThrownSettings();
+
+	m_pWookiee->getTransform()->position = m_pParticle->getInitialPos();
+	m_pWookiee->getTransform()->position.y -= (m_pWookiee->getHeight() / 2) - (m_pParticle->getHeight() / 2);
+
+	m_pStormTroopers->setXDistance(m_pStormTroopers->getXDistance());
+	m_pStormTroopers->getTransform()->position.y = m_pParticle->getInitialPos().y - (m_pStormTroopers->getHeight() / 2) + (m_pParticle->getHeight() / 2);
+
+	m_pBackground->getTransform()->position = glm::vec2(0, 600 - m_pBackground->getHeight());
+	m_pGround[0]->getTransform()->position = glm::vec2(m_pGround[0]->getWidth() / 2, 636 - m_pGround[0]->getHeight() / 2);
+	m_pGround[1]->getTransform()->position = glm::vec2(1920 + m_pGround[1]->getWidth() / 2, 636 - m_pGround[1]->getHeight() / 2);
+
+	for (int i = 0; i < 3; i++)
+		m_pLabels[i]->setEnabled(true);
+	for (int i = 3; i < 6; i++)
+		m_pLabels[i]->setEnabled(false);
+
+	canEditValues = true;
+}
+
+void PlayScene::updateLabels()
+{
+	m_pLabels[0]->setText("X Velocity: " + std::to_string(cos(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity()) + "m/s");
+	m_pLabels[1]->setText("Y Velocity: " + std::to_string(sin(m_pParticle->getLaunchAngle() * Util::Deg2Rad) * m_pParticle->getInitialVelocity()) + "m/s");
+	m_pLabels[3]->setText("X Distance: " + std::to_string(m_pParticle->getDeltaTotalX() / PIXELS_PER_METER) + "m");
+	m_pLabels[4]->setText("Y Distance: " + std::to_string(m_pParticle->getDeltaTotalY() * -1 / PIXELS_PER_METER) + "m");
+	m_pLabels[5]->setText("Time Elapsed: " + std::to_string(m_pParticle->getTotalFlightTime()) + "s");
+}
+
+void PlayScene::GUI_Function()
 {
 	// Always open with a NewFrame
 	ImGui::NewFrame();
 
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
-	
+
 	ImGui::Begin("Your Window Title Goes Here", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
+
+	float initialVelocity = m_pParticle->getInitialVelocity();
+	if (ImGui::SliderFloat("Initial Velocity", &initialVelocity, 20.0f, 200.0f)) {
+		if (canEditValues)
+			m_pParticle->setInitialVelocity(initialVelocity);
+	}
+
+	ImGui::Separator();
+
+	float launchAngle = m_pParticle->getLaunchAngle();
+	if (ImGui::SliderFloat("Launch Angle", &launchAngle, 1.0f, 90.0f)) {
+		if (canEditValues)
+			m_pParticle->setLaunchAngle(launchAngle);
+	}
+
+	ImGui::Separator();
+
+	float gravity = m_pParticle->getGravity();
+	if (ImGui::SliderFloat("Gravity", &gravity, -1.0f, -20.0f)) {
+		if (canEditValues)
+			m_pParticle->setGravity(gravity);
+	}
+
+	ImGui::Separator();
+
+	int xPos = m_pStormTroopers->getXDistance();
+	if (ImGui::SliderInt("Stormtroopers distance", &xPos, 1, 920)) {
+		if (canEditValues)
+			m_pStormTroopers->setXDistance(xPos);
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::Button("Set Values to Solution 1")) {
+		reset();
+		m_pParticle->setInitialVelocity(95);
+		m_pParticle->setLaunchAngle(15.88963);
+		m_pParticle->setGravity(-9.8);
+		m_pStormTroopers->setXDistance(485);
+	}
+
+	if (ImGui::Button("Set Values to Solution 2")) {
+		reset();
+		m_pParticle->setInitialVelocity(95);
+		m_pParticle->setLaunchAngle(45);
+		m_pParticle->setGravity(-9.8);
+		m_pStormTroopers->setXDistance(920);
+	}
+
+	if (ImGui::Button("Reset")) {
+		reset();
+	}
 	
 	ImGui::End();
 }

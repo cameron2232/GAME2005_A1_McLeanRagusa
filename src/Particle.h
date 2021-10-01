@@ -24,17 +24,22 @@ public:
 	float getDeltaTotalX();
 	float getDeltaTotalY();
 	glm::vec2 getInitialPos();
+	float getInitialVelocity();
+	float getLaunchAngle();
+	float getGravity();
+	float getTotalFlightTime();
 
 	//setters
 	void setIsBeingThrown(bool beingThrown);
 	void setInitialPos(glm::vec2 pos);
+	void setInitialVelocity(float vel);
+	void setLaunchAngle(float angle);
+	void setGravity(float grav);
+	void clearThrownSettings();
 private:
 	float m_gravity;
 	bool m_isGrounded;
 	bool m_isBeingThrown;
-
-	glm::vec2 m_currentDirection;
-	glm::vec2 m_targetPosition;
 
 	double launchAngleDeg;
 	int spinAngle;

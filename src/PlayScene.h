@@ -27,6 +27,8 @@ public:
 	virtual void start() override;
 
 	void scrollScene();
+	void reset();
+	void updateLabels();
 private:
 	// IMGUI Function
 	void GUI_Function();
@@ -36,12 +38,14 @@ private:
 
 	// UI Items
 	Button* m_pBackButton;
+	bool canEditValues;
 
 	Particle* m_pParticle;
 	Wookiee* m_pWookiee;
 	StormTroopers* m_pStormTroopers;
 	Background* m_pBackground;
 	std::vector<Ground*> m_pGround;
+	std::vector<Label*> m_pLabels;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
