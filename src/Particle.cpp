@@ -11,8 +11,9 @@ Particle::Particle() : m_gravity(-9.8f), m_isGrounded(false), totalFlightTime(0.
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion1.png", "explode1");
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion2.png", "explode2");
 	TextureManager::Instance().load("../Assets/textures/bomb_explosion3.png", "explode3");
-	SoundManager::Instance().load("../Assets/audio/explosion_1.wav", "Kaboom", SOUND_SFX);
+	SoundManager::Instance().load("../Assets/audio/Explosion2.ogg", "Kaboom", SOUND_SFX);
 
+	SoundManager::Instance().setAllVolume(5);
 	auto size = TextureManager::Instance().getTextureSize("particle");
 	setWidth(size.x);
 	setHeight(size.y);
